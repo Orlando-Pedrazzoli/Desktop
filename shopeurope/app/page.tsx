@@ -1,12 +1,12 @@
 import Container from '@/components/Container';
+import HomeBanner from '@/components/HomeBanner';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 
 const page = () => {
   return (
     <Container>
-      <h1>Home</h1>
-      <Button size='lg'>Check Out</Button>
+      <HomeBanner />
     </Container>
   );
 };
