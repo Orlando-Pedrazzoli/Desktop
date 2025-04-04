@@ -12,7 +12,7 @@ import AddToCartButton from './AddToCartButton';
 const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div className='text-sm border-[1px] border-dark_blue/20 rounded-md bg-white group'>
-      <div className='relative group overflow-hidden bg-shop_light_bg'>
+      <div className='relative group overflow-hidden '>
         {product?.images && (
           <Image
             src={urlFor(product?.images[0]).url()}
@@ -20,7 +20,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             loading='lazy'
             width={700}
             height={700}
-            className={`w-full h-70 object-contain overflow-hidden transition-transform bg-shop_light_bg hoverEffect ${product?.stock !== 0 ? 'group-hover:scale-105' : 'opacity-40'}`}
+            className={`w-full h-70 object-contain overflow-hidden transition-transform  hoverEffect ${product?.stock !== 0 ? 'group-hover:scale-105' : 'opacity-40'}`}
           />
         )}
         <AddToWishListButton product={product} />
@@ -85,7 +85,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           discount={product?.discount}
           className='text-sm'
         />
-        <AddToCartButton />
+        <AddToCartButton product={product} className='w-36 rounded-full' />
       </div>
     </div>
   );
