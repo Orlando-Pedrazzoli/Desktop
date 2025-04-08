@@ -1,30 +1,69 @@
 import { sanityFetch } from '../lib/live';
 import {
+  ADDRESS_QUERY,
+  ALL_PRODUCTS_QUERY,
+  ALLCATEGORIES_QUERY,
+  BANNER_QUERY,
+  BLOG_CATEGORIES,
   BRAND_QUERY,
   BRANDS_QUERY,
   DEAL_PRODUCTS,
+  FEATURE_PRODUCTS,
+  FEATURED_CATEGORY_QUERY,
+  GET_ALL_BLOG,
   LATEST_BLOG_QUERY,
+  OTHERS_BLOG_QUERY,
   PRODUCT_BY_SLUG_QUERY,
+  SINGLE_BLOG_QUERY,
 } from './query';
 
-const getCategories = async (quantity?: number) => {
+const getBanner = async () => {
   try {
-    const query = quantity
-      ? `*[_type == 'category'] | order(name asc) [0...$quantity] {
-          ...,
-          "productCount": count(*[_type == "product" && references(^._id)])
-        }`
-      : `*[_type == 'category'] | order(name asc) {
-          ...,
-          "productCount": count(*[_type == "product" && references(^._id)])
-        }`;
-    const { data } = await sanityFetch({
-      query,
-      params: quantity ? { quantity } : {},
-    });
-    return data;
+    const { data } = await sanityFetch({ query: BANNER_QUERY });
+    return data ?? [];
   } catch (error) {
-    console.log('Error fetching categories', error);
+    console.error('Error fetching sale banner:', error);
+    return [];
+  }
+};
+
+const getFeaturedCategory = async (quantity: number) => {
+  try {
+    const { data } = await sanityFetch({
+      query: FEATURED_CATEGORY_QUERY,
+      params: { quantity },
+    });
+    return data ?? [];
+  } catch (error) {
+    console.error('Error fetching featured category:', error);
+    return [];
+  }
+};
+
+const getAllProducts = async () => {
+  try {
+    const { data } = await sanityFetch({ query: ALL_PRODUCTS_QUERY });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all products:', error);
+    return [];
+  }
+};
+const getDealProducts = async () => {
+  try {
+    const { data } = await sanityFetch({ query: DEAL_PRODUCTS });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all products:', error);
+    return [];
+  }
+};
+const getFeaturedProducts = async () => {
+  try {
+    const { data } = await sanityFetch({ query: FEATURE_PRODUCTS });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all products:', error);
     return [];
   }
 };
@@ -38,25 +77,101 @@ const getAllBrands = async () => {
     return [];
   }
 };
-
 const getLatestBlogs = async () => {
   try {
     const { data } = await sanityFetch({ query: LATEST_BLOG_QUERY });
     return data ?? [];
   } catch (error) {
-    console.log('Error fetching latest Blogs:', error);
+    console.log('Error fetching all brands:', error);
     return [];
   }
 };
-const getDealProducts = async () => {
+const getAllBlogs = async (quantity: number) => {
   try {
-    const { data } = await sanityFetch({ query: DEAL_PRODUCTS });
+    const { data } = await sanityFetch({
+      query: GET_ALL_BLOG,
+      params: { quantity },
+    });
     return data ?? [];
   } catch (error) {
-    console.log('Error fetching deal Products:', error);
+    console.log('Error fetching all brands:', error);
     return [];
   }
 };
+
+const getSingleBlog = async (slug: string) => {
+  try {
+    const { data } = await sanityFetch({
+      query: SINGLE_BLOG_QUERY,
+      params: { slug },
+    });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all brands:', error);
+    return [];
+  }
+};
+
+const getBlogCategories = async () => {
+  try {
+    const { data } = await sanityFetch({
+      query: BLOG_CATEGORIES,
+    });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all brands:', error);
+    return [];
+  }
+};
+
+const getOthersBlog = async (slug: string, quantity: number) => {
+  try {
+    const { data } = await sanityFetch({
+      query: OTHERS_BLOG_QUERY,
+      params: { slug, quantity },
+    });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching all brands:', error);
+    return [];
+  }
+};
+const getAddresses = async () => {
+  try {
+    const { data } = await sanityFetch({
+      query: ADDRESS_QUERY,
+    });
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching address:', error);
+    return [];
+  }
+};
+
+const getCategories = async (quantity?: number) => {
+  try {
+    const query = quantity
+      ? `*[_type == 'category'] | order(name asc) [0...$quantity] {
+          ...,
+          "productCount": count(*[_type == "product" && references(^._id)])
+        }`
+      : `*[_type == 'category'] | order(name asc) {
+          ...,
+          "productCount": count(*[_type == "product" && references(^._id)])
+        }`;
+
+    const { data } = await sanityFetch({
+      query,
+      params: quantity ? { quantity } : {},
+    });
+
+    return data ?? [];
+  } catch (error) {
+    console.log('Error fetching categories with product count:', error);
+    return [];
+  }
+};
+
 const getProductBySlug = async (slug: string) => {
   try {
     const product = await sanityFetch({
@@ -71,6 +186,7 @@ const getProductBySlug = async (slug: string) => {
     return null;
   }
 };
+
 const getBrand = async (slug: string) => {
   try {
     const product = await sanityFetch({
@@ -87,10 +203,19 @@ const getBrand = async (slug: string) => {
 };
 
 export {
-  getCategories,
+  getBanner,
+  getFeaturedCategory,
+  getAllProducts,
+  getDealProducts,
+  getFeaturedProducts,
   getAllBrands,
   getLatestBlogs,
-  getDealProducts,
+  getSingleBlog,
+  getAllBlogs,
+  getBlogCategories,
+  getOthersBlog,
+  getAddresses,
+  getCategories,
   getProductBySlug,
   getBrand,
 };
