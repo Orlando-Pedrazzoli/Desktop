@@ -1,5 +1,4 @@
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
-import React from 'react';
 
 interface ContactItemData {
   title: string;
@@ -40,23 +39,37 @@ const data: ContactItemData[] = [
 
 const FooterTop = () => {
   return (
-    <div className='grid grid-cols-2 lg:grid-cols-4 gap-8 border-b'>
-      {data?.map((item, index) => (
-        <div
+    <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 border-b'>
+      {data.map((item, index) => (
+        <ContactItem
           key={index}
-          className='flex items-center gap-3 group hover:bg-gray-50 p-4 transition-colors hoverEffect'
-        >
-          {item?.icon}
-          <div>
-            <h3 className='font-semibold text-gray-900 group-hover:text-black hoverEffect'>
-              {item?.title}
-            </h3>
-            <p className='text-gray-600 text-sm mt-1 group-hover:text-gray-900 hoverEffect'>
-              {item?.subtitle}
-            </p>
-          </div>
-        </div>
+          icon={item.icon}
+          title={item.title}
+          content={item.subtitle}
+        />
       ))}
+    </div>
+  );
+};
+
+interface ContactItemProps {
+  icon: React.ReactNode;
+  title: string;
+  content: string;
+}
+
+const ContactItem = ({ icon, title, content }: ContactItemProps) => {
+  return (
+    <div className='flex items-center gap-3 group hover:bg-gray-50 p-4 transition-colors'>
+      {icon}
+      <div>
+        <h3 className='font-semibold text-gray-900 group-hover:text-primary transition-colors'>
+          {title}
+        </h3>
+        <p className='text-gray-600 text-sm mt-1 group-hover:text-gray-900 transition-colors'>
+          {content}
+        </p>
+      </div>
     </div>
   );
 };

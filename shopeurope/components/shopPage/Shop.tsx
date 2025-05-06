@@ -1,39 +1,40 @@
 'use client';
 import { BRANDS_QUERYResult, Category, Product } from '@/sanity.types';
-import React, { useEffect, useState } from 'react';
-import Container from './Container';
-import Title from './Title';
-import CategoryList from './shop/CategoryList';
-import { useSearchParams } from 'next/navigation';
-import BrandList from './shop/BrandList';
-import PriceList from './shop/PriceList';
 import { client } from '@/sanity/lib/client';
+import React, { useEffect, useState } from 'react';
+import Container from '../Container';
+import Title from '../Title';
+import CategoryList from './CategoryList';
 import { Loader2 } from 'lucide-react';
-import NoProductAvailable from './NoProductAvailable';
-import ProductCard from './ProductCard';
+import ProductCard from '../ProductCard';
+import NoProductAvailable from '../new/NoProductAvailable';
+import BrandList from './BrandList';
+import { useSearchParams } from 'next/navigation';
+import PriceList from './PriceList';
 
 interface Props {
   categories: Category[];
   brands: BRANDS_QUERYResult;
 }
+
 const Shop = ({ categories, brands }: Props) => {
   const searchParams = useSearchParams();
   const brandParams = searchParams?.get('brand');
-  const categoryParams = searchParams?.get('category');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryParams || null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(
     brandParams || null
   );
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      // Extract min and max price from selectedPrice
       let minPrice = 0;
-      let maxPrice = 10000;
+      let maxPrice = 10000; // Default high value
+
       if (selectedPrice) {
         const [min, max] = selectedPrice.split('-').map(Number);
         minPrice = min;
@@ -49,9 +50,20 @@ const Shop = ({ categories, brands }: Props) => {
         ...,"categories": categories[]->title
       }
     `;
+      //   const query = `
+      //   *[_type == 'product' && (!defined($selectedCategory) || references(*[_type == "category" && slug.current == $selectedCategory]._id)) && (!defined($selectedBrand) || references(*[_type == "brand" && slug.current == $selectedBrand]._id))]
+      //   | order(name asc) {
+      //     ...,"categories": categories[]->title
+      //   }
+      // `;
       const data = await client.fetch(
         query,
-        { selectedCategory, selectedBrand, minPrice, maxPrice },
+        {
+          selectedCategory,
+          selectedBrand,
+          minPrice,
+          maxPrice,
+        },
         { next: { revalidate: 0 } }
       );
       setProducts(data);
@@ -61,15 +73,15 @@ const Shop = ({ categories, brands }: Props) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchProducts();
   }, [selectedCategory, selectedBrand, selectedPrice]);
+
   return (
-    <div className='border-t'>
+    <div className='bg-white border-t'>
       <Container className='mt-5'>
         <div className='sticky top-0 z-10 mb-5'>
-          <div className='flex items-center justify-between'>
+          <div className='flex justify-between items-center'>
             <Title className='text-lg uppercase tracking-wide'>
               Get the products as your needs
             </Title>
@@ -89,8 +101,9 @@ const Shop = ({ categories, brands }: Props) => {
             )}
           </div>
         </div>
-        <div className='flex flex-col md:flex-row gap-5 border-t border-t-shop_dark_green/50'>
-          <div className='md:sticky md:top-20 md:self-start md:h-[calc(100vh-160px)] md:overflow-y-auto md:min-w-64 pb-5 md:border-r border-r-shop_btn_dark_green/50 scrollbar-hide'>
+
+        <div className='flex flex-col md:flex-row gap-5 border-t border-t-shop_btn_dark_green/50'>
+          <div className='md:sticky md:top-20 md:self-start md:h-[calc(100vh-160px)] md:overflow-y-auto md:min-w-64 pb-5 scrollbar-hide border-r border-r-shop_btn_dark_green/50'>
             <CategoryList
               categories={categories}
               selectedCategory={selectedCategory}
@@ -116,7 +129,7 @@ const Shop = ({ categories, brands }: Props) => {
                   </p>
                 </div>
               ) : products?.length > 0 ? (
-                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5'>
+                <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5'>
                   {products?.map(product => (
                     <ProductCard key={product?._id} product={product} />
                   ))}
