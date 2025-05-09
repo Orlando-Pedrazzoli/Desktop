@@ -14,6 +14,5 @@ export function useOutsideClick<T extends HTMLElement>(callback: () => void) {
       document.removeEventListener('mousedown', handleClickedOutside);
     };
   }, [callback]);
-
   return ref;
 }

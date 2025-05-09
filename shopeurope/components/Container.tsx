@@ -1,13 +1,15 @@
 import { cn } from '@/lib/utils';
+import React from 'react';
 
-interface Props {
+const Container = ({
+  children,
+  className,
+}: {
   children: React.ReactNode;
   className?: string;
-}
-
-const Container = ({ children, className }: Props) => {
+}) => {
   return (
-    <div className={cn('max-w-(--breakpoint-xl) mx-auto px-4', className)}>
+    <div className={cn('max-w-screen-xl mx-auto px-4', className)}>
       {children}
     </div>
   );

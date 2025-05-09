@@ -1,6 +1,6 @@
-import { Product } from './sanity.types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { Product } from './sanity.types';
 
 export interface CartItem {
   product: Product;
@@ -17,14 +17,14 @@ interface StoreState {
   getSubTotalPrice: () => number;
   getItemCount: (productId: string) => number;
   getGroupedItems: () => CartItem[];
-  // favorite
+  //   // favorite
   favoriteProduct: Product[];
   addToFavorite: (product: Product) => Promise<void>;
   removeFromFavorite: (productId: string) => void;
   resetFavorite: () => void;
 }
 
-const useCartStore = create<StoreState>()(
+const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
       items: [],
@@ -111,8 +111,10 @@ const useCartStore = create<StoreState>()(
         set({ favoriteProduct: [] });
       },
     }),
-    { name: 'cart-store' }
+    {
+      name: 'cart-store',
+    }
   )
 );
 
-export default useCartStore;
+export default useStore;

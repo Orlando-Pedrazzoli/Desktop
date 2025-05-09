@@ -1,16 +1,16 @@
 'use server';
 
 import stripe from '@/lib/stripe';
-import Stripe from 'stripe';
+import { Address } from '@/sanity.types';
 import { urlFor } from '@/sanity/lib/image';
 import { CartItem } from '@/store';
-import { Address } from '@/sanity.types';
+import Stripe from 'stripe';
 
 export interface Metadata {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
-  clerkUserId: string;
+  clerkUserId?: string;
   address?: Address | null;
 }
 
@@ -24,26 +24,19 @@ export async function createCheckoutSession(
   metadata: Metadata
 ) {
   try {
-    // Validate if any grouped items don't have a price
-    const itemsWithoutPrice = items.filter(item => !item.product.price);
-    if (itemsWithoutPrice.length > 0) {
-      throw new Error('Some items do not have a price');
-    }
-
     // Retrieve existing customer or create a new one
     const customers = await stripe.customers.list({
       email: metadata.customerEmail,
       limit: 1,
     });
-
-    const customerId = customers.data.length > 0 ? customers.data[0].id : '';
+    const customerId = customers?.data?.length > 0 ? customers.data[0].id : '';
 
     const sessionPayload: Stripe.Checkout.SessionCreateParams = {
       metadata: {
         orderNumber: metadata.orderNumber,
         customerName: metadata.customerName,
         customerEmail: metadata.customerEmail,
-        clerkUserId: metadata.clerkUserId,
+        clerkUserId: metadata.clerkUserId!,
         address: JSON.stringify(metadata.address),
       },
       mode: 'payment',
@@ -56,25 +49,23 @@ export async function createCheckoutSession(
         process.env.NEXT_PUBLIC_BASE_URL
       }/success?session_id={CHECKOUT_SESSION_ID}&orderNumber=${metadata.orderNumber}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
-      line_items: items.map(item => ({
+      line_items: items?.map(item => ({
         price_data: {
           currency: 'USD',
-          unit_amount: Math.round(item.product.price! * 100), // Convert to cents
+          unit_amount: Math.round(item?.product?.price! * 100),
           product_data: {
-            name: item.product.name || 'Unnamed Product',
-            description: item.product.description,
-            metadata: { id: item.product._id },
+            name: item?.product?.name || 'Unknown Product',
+            description: item?.product?.description,
+            metadata: { id: item?.product?._id },
             images:
-              item.product.images && item.product.images.length > 0
-                ? [urlFor(item.product.images[0]).url()]
+              item?.product?.images && item?.product?.images?.length > 0
+                ? [urlFor(item?.product?.images[0]).url()]
                 : undefined,
           },
         },
-        quantity: item.quantity,
+        quantity: item?.quantity,
       })),
     };
-
-    // Conditionally add customer or customer_email
     if (customerId) {
       sessionPayload.customer = customerId;
     } else {
@@ -82,11 +73,9 @@ export async function createCheckoutSession(
     }
 
     const session = await stripe.checkout.sessions.create(sessionPayload);
-
     return session.url;
-    // return null;
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    console.error('Error creating Checkout Session', error);
     throw error;
   }
 }

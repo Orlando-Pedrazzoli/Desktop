@@ -1,13 +1,12 @@
 'use client';
 import { Product } from '@/sanity.types';
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import PriceFormatter from './PriceFormatter';
 import { Button } from './ui/button';
-import useCartStore from '@/store';
-import QuantityButtons from './QuantityButtons';
 import { cn } from '@/lib/utils';
 import { ShoppingBag } from 'lucide-react';
+import useStore from '@/store';
+import toast from 'react-hot-toast';
+import PriceFormatter from './PriceFormatter';
+import QuantityButtons from './QuantityButtons';
 
 interface Props {
   product: Product;
@@ -15,22 +14,9 @@ interface Props {
 }
 
 const AddToCartButton = ({ product, className }: Props) => {
-  const { addItem, getItemCount } = useCartStore();
-  const [isClient, setIsClient] = useState(false);
-
+  const { addItem, getItemCount } = useStore();
   const itemCount = getItemCount(product?._id);
   const isOutOfStock = product?.stock === 0;
-
-  // Use useEffect to set isClient to true after component mounts
-  // This ensures that the component only renders on the client-side
-  // Preventing hydration errors due to server/client mismatch
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  if (!isClient) {
-    return null;
-  }
 
   const handleAddToCart = () => {
     if ((product?.stock as number) > itemCount) {
@@ -47,13 +33,13 @@ const AddToCartButton = ({ product, className }: Props) => {
       {itemCount ? (
         <div className='text-sm w-full'>
           <div className='flex items-center justify-between'>
-            <span className='text-xs text-muted-foreground'>Quantity</span>
+            <span className='text-xs text-darkColor/80'>Quantity</span>
             <QuantityButtons product={product} />
           </div>
           <div className='flex items-center justify-between border-t pt-1'>
             <span className='text-xs font-semibold'>Subtotal</span>
             <PriceFormatter
-              amount={product?.price ? product.price * itemCount : 0}
+              amount={product?.price ? product?.price * itemCount : 0}
             />
           </div>
         </div>
@@ -62,7 +48,7 @@ const AddToCartButton = ({ product, className }: Props) => {
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'w-full bg-shop_dark_green/80 text-lightBg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide hover:text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect',
+            'w-full bg-shop_dark_green/80 text-lightBg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect',
             className
           )}
         >

@@ -14,7 +14,6 @@ interface SidebarProps {
 const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const pathname = usePathname();
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
-
   return (
     <div
       className={`fixed inset-y-0 h-screen left-0 z-50 w-full bg-black/50 text-white/70 shadow-xl ${
@@ -34,6 +33,7 @@ const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
             <X />
           </button>
         </div>
+
         <div className='flex flex-col space-y-3.5 font-semibold tracking-wide'>
           {headerData?.map(item => (
             <Link

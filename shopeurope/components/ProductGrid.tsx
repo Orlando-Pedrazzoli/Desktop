@@ -4,15 +4,15 @@ import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { motion, AnimatePresence } from 'motion/react';
 import { client } from '@/sanity/lib/client';
-import HomeTabbar from './new/HomeTabbar';
-import { productType } from '@/constants';
-import NoProductAvailable from './new/NoProductAvailable';
+import NoProductAvailable from './NoProductAvailable';
 import { Loader2 } from 'lucide-react';
 import Container from './Container';
-import { ALL_PRODUCTS_QUERYResult } from '@/sanity.types';
+import HomeTabbar from './HomeTabbar';
+import { productType } from '@/constants/data';
+import { Product } from '@/sanity.types';
 
 const ProductGrid = () => {
-  const [products, setProducts] = useState<ALL_PRODUCTS_QUERYResult>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(productType[0]?.title || '');
   const query = `*[_type == "product" && variant == $variant] | order(name asc){
@@ -36,7 +36,7 @@ const ProductGrid = () => {
   }, [selectedTab]);
 
   return (
-    <Container className='flex flex-col lg:px-0'>
+    <Container className='flex flex-col lg:px-0 my-10'>
       <HomeTabbar selectedTab={selectedTab} onTabSelect={setSelectedTab} />
       {loading ? (
         <div className='flex flex-col items-center justify-center py-10 min-h-80 space-y-4 text-center bg-gray-100 rounded-lg w-full mt-10'>

@@ -1,22 +1,25 @@
+import Container from '@/components/Container';
+import HomeBanner from '@/components/HomeBanner';
 import HomeCategories from '@/components/HomeCategories';
 import LatestBlog from '@/components/LatestBlog';
-import HomeBanner from '@/components/new/HomeBanner';
 import ProductGrid from '@/components/ProductGrid';
 import ShopByBrands from '@/components/ShopByBrands';
 import { getCategories } from '@/sanity/queries';
 
-export default async function Home() {
+import React from 'react';
+
+const Home = async () => {
   const categories = await getCategories(6);
 
   return (
-    <div>
+    <Container className='bg-shop-light-pink'>
       <HomeBanner />
-      <div className='py-10'>
-        <ProductGrid />
-        <HomeCategories categories={categories} />
-        <ShopByBrands />
-        <LatestBlog />
-      </div>
-    </div>
+      <ProductGrid />
+      <HomeCategories categories={categories} />
+      <ShopByBrands />
+      <LatestBlog />
+    </Container>
   );
-}
+};
+
+export default Home;
